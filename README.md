@@ -90,7 +90,3 @@ clientId: "1498751319404707941"
 ```
 
 Replace it with your own Discord application ID if needed.
-
-## License
-
-MIT
