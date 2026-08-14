@@ -1,6 +1,5 @@
 import { Client } from "@xhayper/discord-rpc";
 import { exec } from "child_process";
-import axios from "axios";
 
 const client = new Client({
   clientId: "1498751319404707941",
@@ -15,43 +14,43 @@ function run(cmd: string): Promise<string> {
   });
 }
 
+function osascript(script: string): Promise<string> {
+  return run(`osascript -e '${script}'`);
+}
+
 type Track = {
   artist: string;
   title: string;
   artwork?: string;
+  durationMs: number;
+  positionMs: number;
 };
-
-async function getITunesArtwork(title: string, artist: string) {
-  try {
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(
-      `${artist} ${title}`
-    )}&entity=song&limit=1`;
-
-    const res = await axios.get(url);
-    const song = res.data?.results?.[0];
-
-    if (!song?.artworkUrl100) return undefined;
-
-    return song.artworkUrl100.replace("100x100bb.jpg", "512x512bb.jpg");
-  } catch {
-    return undefined;
-  }
-}
 
 async function getNowPlaying(): Promise<Track | null> {
   try {
-    const artist = await run("nowplaying-cli get artist");
-    const title = await run("nowplaying-cli get title");
+    const isRunning = await osascript('application "Spotify" is running');
+    if (isRunning !== "true") return null;
+
+    const state = await osascript(
+      'tell application "Spotify" to player state as string'
+    );
+    if (state !== "playing") return null;
+
+    const [artist, title, artwork, duration, position] = await Promise.all([
+      osascript('tell application "Spotify" to artist of current track as string'),
+      osascript('tell application "Spotify" to name of current track as string'),
+      osascript('tell application "Spotify" to artwork url of current track as string'),
+      osascript('tell application "Spotify" to duration of current track as string'),
+      osascript("tell application \"Spotify\" to player position as string"),
+    ]);
 
     if (!artist || !title) return null;
 
-    const artwork = await getITunesArtwork(title, artist);
+    const durationMs = parseInt(duration, 10);
+    const positionMs = Math.round(parseFloat(position.replace(",", ".")) * 1000);
 
-    return {
-      artist,
-      title,
-      artwork,
-    };
+    const track = { artist, title, durationMs, positionMs };
+    return artwork ? { ...track, artwork } : track;
   } catch {
     return null;
   }
@@ -66,11 +65,21 @@ async function start() {
 
   setInterval(async () => {
     const track = await getNowPlaying();
-    if (!track) return;
+
+    if (!track) {
+      if (last) {
+        last = "";
+        await client.user?.clearActivity();
+      }
+      return;
+    }
 
     const key = `${track.artist}-${track.title}`;
     if (key === last) return;
     last = key;
+
+    const startTimestamp = Date.now() - track.positionMs;
+    const endTimestamp = startTimestamp + track.durationMs;
 
     await client.user?.setActivity({
       type: 2,
@@ -78,7 +87,7 @@ async function start() {
       details: track.title,
       state: track.artist,
 
-      name: `Listening to ${track.title}`,
+      name: `${track.title}`,
 
       largeImageKey: track.artwork ?? "spotify",
       largeImageText: track.title,
@@ -86,9 +95,10 @@ async function start() {
       smallImageKey: "icon",
       smallImageText: "UNI Media Player",
 
-      startTimestamp: Date.now(),
+      startTimestamp,
+      endTimestamp,
     });
-  }, 5000);
+  }, 2000);
 }
 
 start().catch(console.error);

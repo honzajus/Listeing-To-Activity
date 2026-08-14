@@ -1,92 +1,31 @@
-# UNI Media Player Discord Rich Presence
+# Listening To Activity
 
-Display your currently playing music from UNI Media Player as a Discord Rich Presence status.
+Zobrazuje skladbu, kterou právě přehráváš v desktopové aplikaci **Spotify** na Macu, jako Discord Rich Presence (stavovka „Listening to...“ s obalem alba).
 
-## Features
+Zdrojem dat je výhradně desktopová aplikace Spotify na tomto počítači (přes AppleScript) – žádný jiný přehrávač ani Spotify Web/mobil se nesledují.
 
-* Shows the current track title and artist in Discord
-* Automatically updates when the song changes
-* Fetches album artwork from the iTunes Search API
-* Displays track artwork as the large Rich Presence image
-* Lightweight and runs in the background
+## Instalace
 
-## Requirements
-
-* Node.js 18+
-* Discord desktop application
-* UNI Media Player
-* `nowplaying-cli`
-
-## Installation
+Vyžaduje macOS, Node.js 18+ a nainstalovaný Discord desktop.
 
 ```bash
-git clone https://github.com/yourusername/uni-media-player-rpc.git
-cd uni-media-player-rpc
 npm install
 ```
 
-## Dependencies
-
-```bash
-npm install @xhayper/discord-rpc axios
-```
-
-## Usage
-
-Start the application:
+## Použití
 
 ```bash
 npm run start
 ```
 
-or
+Skript se přihlásí k Discord RPC a každých 5 sekund zkontroluje, co hraje ve Spotify. Když se skladba změní, aktualizuje se Rich Presence; když Spotify nehraje (je zavřená nebo na pauze), stavovka zmizí.
 
-```bash
-npx tsx index.ts
-```
+## Konfigurace
 
-## How It Works
-
-The application:
-
-1. Reads the currently playing track using `nowplaying-cli`
-2. Retrieves album artwork from the iTunes Search API
-3. Connects to Discord Rich Presence
-4. Updates your Discord status every 5 seconds
-5. Refreshes only when the track changes
-
-## Rich Presence Example
-
-**Details**
-
-```
-Song Title
-```
-
-**State**
-
-```
-Artist Name
-```
-
-**Large Image**
-
-```
-Album Artwork
-```
-
-**Small Image**
-
-```
-UNI Media Player
-```
-
-## Configuration
-
-The Discord application ID is configured directly in the source:
+Discord Application ID je natvrdo v [main.ts](main.ts):
 
 ```ts
 clientId: "1498751319404707941"
 ```
 
-Replace it with your own Discord application ID if needed.
+Pro vlastní Discord aplikaci ho stačí nahradit.
