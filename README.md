@@ -1,4 +1,4 @@
-# Listening To Activity
+# Listeing-To-Activity
 
 Zobrazuje skladbu, kterou právě přehráváš v desktopové aplikaci **Spotify** na Macu, jako Discord Rich Presence (stavovka „Listening to...“ s obalem alba).
 
@@ -18,7 +18,7 @@ npm install
 npm run start
 ```
 
-Skript se přihlásí k Discord RPC a každých 5 sekund zkontroluje, co hraje ve Spotify. Když se skladba změní, aktualizuje se Rich Presence; když Spotify nehraje (je zavřená nebo na pauze), stavovka zmizí.
+Skript se přihlásí k Discord RPC a každé 2 sekundy zkontroluje, co hraje ve Spotify. Když se skladba změní, aktualizuje se Rich Presence; když Spotify nehraje (je zavřená nebo na pauze), stavovka zmizí.
 
 ## Konfigurace
 
