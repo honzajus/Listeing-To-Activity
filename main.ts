@@ -21,6 +21,7 @@ function osascript(script: string): Promise<string> {
 type Track = {
   artist: string;
   title: string;
+  album: string;
   artwork?: string;
   durationMs: number;
   positionMs: number;
@@ -36,9 +37,10 @@ async function getNowPlaying(): Promise<Track | null> {
     );
     if (state !== "playing") return null;
 
-    const [artist, title, artwork, duration, position] = await Promise.all([
+    const [artist, title, album, artwork, duration, position] = await Promise.all([
       osascript('tell application "Spotify" to artist of current track as string'),
       osascript('tell application "Spotify" to name of current track as string'),
+      osascript('tell application "Spotify" to album of current track as string'),
       osascript('tell application "Spotify" to artwork url of current track as string'),
       osascript('tell application "Spotify" to duration of current track as string'),
       osascript("tell application \"Spotify\" to player position as string"),
@@ -49,7 +51,7 @@ async function getNowPlaying(): Promise<Track | null> {
     const durationMs = parseInt(duration, 10);
     const positionMs = Math.round(parseFloat(position.replace(",", ".")) * 1000);
 
-    const track = { artist, title, durationMs, positionMs };
+    const track = { artist, title, album, durationMs, positionMs };
     return artwork ? { ...track, artwork } : track;
   } catch {
     return null;
@@ -90,7 +92,7 @@ async function start() {
       name: `${track.title}`,
 
       largeImageKey: track.artwork ?? "spotify",
-      largeImageText: track.title,
+      largeImageText: track.album,
 
       smallImageKey: "icon",
       smallImageText: "UNI Media Player",
