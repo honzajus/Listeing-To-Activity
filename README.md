@@ -1,31 +1,31 @@
 # Listeing-To-Activity
 
-Zobrazuje skladbu, kterou právě přehráváš v desktopové aplikaci **Spotify** na Macu, jako Discord Rich Presence (stavovka „Listening to...“ s obalem alba).
+Shows the track currently playing in the **Spotify** desktop app on your Mac as a Discord Rich Presence status (a "Listening to..." status with the album cover).
 
-Zdrojem dat je výhradně desktopová aplikace Spotify na tomto počítači (přes AppleScript) – žádný jiný přehrávač ani Spotify Web/mobil se nesledují.
+The only data source is the Spotify desktop app on this machine (via AppleScript) — no other player, and no Spotify Web/mobile, is tracked.
 
-## Instalace
+## Installation
 
-Vyžaduje macOS, Node.js 18+ a nainstalovaný Discord desktop.
+Requires macOS, Node.js 18+, and the Discord desktop app installed.
 
 ```bash
 npm install
 ```
 
-## Použití
+## Usage
 
 ```bash
 npm run start
 ```
 
-Skript se přihlásí k Discord RPC a každé 2 sekundy zkontroluje, co hraje ve Spotify. Když se skladba změní, aktualizuje se Rich Presence; když Spotify nehraje (je zavřená nebo na pauze), stavovka zmizí.
+The script logs into Discord RPC and checks what's playing in Spotify every 2 seconds. The Rich Presence updates when the track changes, and clears when Spotify isn't playing (closed or paused).
 
-## Konfigurace
+## Configuration
 
-Discord Application ID je natvrdo v [main.ts](main.ts):
+The Discord application ID is hardcoded in [main.ts](main.ts):
 
 ```ts
 clientId: "1498751319404707941"
 ```
 
-Pro vlastní Discord aplikaci ho stačí nahradit.
+Replace it with your own Discord application ID if needed.
